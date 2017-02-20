@@ -1,10 +1,7 @@
 package org.sonatype.maven.polyglot.toml;
 
 import com.moandjiezana.toml.Toml;
-import org.apache.maven.model.Contributor;
-import org.apache.maven.model.Dependency;
-import org.apache.maven.model.Developer;
-import org.apache.maven.model.Model;
+import org.apache.maven.model.*;
 import org.apache.maven.model.io.ModelParseException;
 import org.apache.maven.model.io.ModelReader;
 import org.codehaus.plexus.component.annotations.Component;
@@ -30,15 +27,45 @@ public class TomlModelReader extends ModelReaderSupport {
     }
 
     Toml toml = new Toml().read(input);
-    Model m = parseBasicInfo(toml);
-    parseProperties(toml, m);
-    parseDevelopers(toml, m);
-    parseDependencies(toml, m);
-    parseContributors(toml, m);
-    parseModules(toml, m);
-    parseBuild(toml, m);
+    return parseProject(toml);
+  }
+
+  private Model parseProject(Toml projectToml) {
+    Model m = parseBasicInfo(projectToml);
+    parseProperties(projectToml, m);
+    parseDevelopers(projectToml, m);
+    parseDependencies(projectToml, m);
+    parseContributors(projectToml, m);
+    parseModules(projectToml, m);
+    parseBuild(projectToml, m);
     return m;
   }
+
+  /*
+parent
+url
+inceptionYear
+organization
+licenses/license*
+developers/developer*
+contributors/contributor*
+mailingLists/mailingList*
+prerequisites
+modules/module*
+scm
+issueManagement
+ciManagement
+distributionManagement
+properties/key=value*
+dependencyManagement
+dependencies/dependency*
+repositories/repository*
+pluginRepositories/pluginRepository*
+build
+reports
+reporting
+profiles/profile*
+   */
 
   private Model parseDependencies(final Toml pom, final Model model) {
     Toml dependenciesTable = pom.getTable("dependencies");
@@ -110,6 +137,16 @@ public class TomlModelReader extends ModelReaderSupport {
   private Model parseBuildPlugins(final List<Toml> pluginTomls, final Model model) {
     
     return model;
+  }
+
+  private PluginExecution parseExecution(final Toml executionTable) {
+    PluginExecution pluginExecution = new PluginExecution();
+    pluginExecution.setId(executionTable.getString("id"));
+    pluginExecution.setPhase(executionTable.getString("phase"));
+    pluginExecution.setInherited(executionTable.getString("inherited"));
+    pluginExecution.setGoals((List<String>) executionTable.getList());
+    pluginExecution.setConfiguration(executionTable.getTable("configuration"));//FIXME this probably doesn't work
+    return pluginExecution;
   }
 
   private Dependency parseDependencyKey(final String dependencyKey) {
