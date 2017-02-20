@@ -5,9 +5,6 @@ packaging = "jar"
 name = "Raven"
 description = "Hybrid Maven 3.x & JRuby Build System"
 
-[properties]
-mavenVersion = "3.0"
-
 developers = [
   { id = "jvanzyl", name = "Jason van Zyl" }
 ]
@@ -15,6 +12,15 @@ developers = [
 contributors = [
  { name = "Will Price" }
 ]
+
+modules = [
+  "reader",
+  "writer",
+  "shell-integration"
+]
+
+[properties]
+mavenVersion = "3.0"
 
 [dependencies]
 "org.apache.maven:maven-core" = "3.0"
@@ -27,3 +33,15 @@ contributors = [
 #    - {artifactId: ant-launcher, groupId: org.apache.ant}
 #FIXME test inline table syntax for scopes etc foo = {}
 #FIXME add [dependencies.test] etc
+
+[build.plugins]
+  [[build.plugins.plugin]]
+  groupId = "org.apache.maven.plugins"
+  artifactId = "maven-compiler-plugin"
+  version = "2.0.2"
+  executions = [
+    { goals = ["generateStubs", "compile", "generateTestStubs", "testCompile"]  }
+  ]
+  [build.plugins.plugin.configuration]
+    source = "1.6"
+    target = "1.5"

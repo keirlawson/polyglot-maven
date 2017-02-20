@@ -1,6 +1,7 @@
 package org.sonatype.maven.polyglot.toml;
 
 import com.moandjiezana.toml.Toml;
+import org.apache.maven.model.Contributor;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Developer;
 import org.apache.maven.model.Model;
@@ -28,25 +29,28 @@ public class TomlModelReader extends ModelReaderSupport {
       throw new IllegalArgumentException("TOML Reader is null.");
     }
 
-    //FIXME do parse here
-    //return (Model) yaml.load(input);
     Toml toml = new Toml().read(input);
     Model m = parseBasicInfo(toml);
     parseProperties(toml, m);
     parseDevelopers(toml, m);
-    Toml dependenciesTable = toml.getTable("dependencies");
+    parseDependencies(toml, m);
+    parseContributors(toml, m);
+    parseModules(toml, m);
+    parseBuild(toml, m);
+    return m;
+  }
+
+  private Model parseDependencies(final Toml pom, final Model model) {
+    Toml dependenciesTable = pom.getTable("dependencies");
     for (Entry<String, Object> entry: dependenciesTable.entrySet()) {
-      System.out.println(entry.getKey());
       Dependency dependency = parseDependencyKey(entry.getKey());
       if (dependenciesTable.containsTable(entry.getKey())) {
-        System.out.println(entry.getKey());
       } else {
         dependency.setVersion(dependenciesTable.getString(entry.getKey()));
       }
-      m.addDependency(dependency);
+      model.addDependency(dependency);
     }
-
-    return m;
+    return model;
   }
 
   private Model parseBasicInfo(final Toml pom) {
@@ -60,35 +64,51 @@ public class TomlModelReader extends ModelReaderSupport {
     return model;
   }
 
+  // FIXME: 2/20/17 neither this nor contributors has properties support
   private Model parseDevelopers(final Toml pom, final Model model) {
-    final List<Developer> developers = new ArrayList<>();
-    List<Object> developerTables = pom.getList("developers");
-//    for (Toml developerTable : developerTables) {
-//      developers.add(parseDeveloper(developerTable));
-//    }
-    model.setDevelopers(developerTables);
+    final List<Developer> developers = parseTableToList(pom, "developers", Developer.class);
+    model.setDevelopers(developers);
     return model;
   }
 
-  private Developer parseDeveloper(final Toml developerToml) {
-    Developer developer = new Developer();
-    developer.setId(developerToml.getString("id"));
-    developer.setName(developerToml.getString("name"));
-    //FIXME fill in more here
-    return developer;
+  private Model parseContributors(final Toml pom, final Model model) {
+    final List<Contributor> contributors = parseTableToList(pom, "contributors", Contributor.class);
+    model.setContributors(contributors);
+    return model;
   }
 
-  private Model parseContributors(final Toml pom, final Model model) {
+  private <T> List<T> parseTableToList(final Toml pom, final String key, final Class<T> clazz) {
+    final List<T> list = new ArrayList<>();
+    List<Toml> developerTables = pom.getTables(key);
+    for (Toml developerTable : developerTables) {
+      list.add(developerTable.to(clazz));
+    }
+    return list;
+  }
+
+  private Model parseModules(final Toml pom, final Model model) {
+    List<String> modules = pom.getList("modules");
+    model.setModules(modules);
     return model;
   }
 
   private Model parseProperties(final Toml pom, final Model model) {
-//    final Properties properties = new Properties();
-//    final Toml propertiesTable = pom.getTable("properties");
-//    for (Map.Entry<String, Object> entry : propertiesTable.entrySet()) {
-//      properties.setProperty(entry.getKey(), propertiesTable.getString(entry.getKey()));
-//    }
-//    model.setProperties(properties);
+    final Properties properties = new Properties();
+    final Toml propertiesTable = pom.getTable("properties");
+    for (Map.Entry<String, Object> entry : propertiesTable.entrySet()) {
+      properties.setProperty(entry.getKey(), propertiesTable.getString(entry.getKey()));
+    }
+    model.setProperties(properties);
+    return model;
+  }
+
+  private Model parseBuild(final Toml pom, final Model model) {
+    parseBuildPlugins(pom.getTables("plugins"), model);
+    return model;
+  }
+
+  private Model parseBuildPlugins(final List<Toml> pluginTomls, final Model model) {
+    
     return model;
   }
 

@@ -63,11 +63,11 @@ public class TomlModelReaderTest {
     assertEquals("jvanzyl", dev0.getId());
     assertEquals("Jason van Zyl", dev0.getName());
 
-//    // Contributors
-//    List<Contributor> contributors = model.getContributors();
-//    Contributor con0 = contributors.get(0);
-//    assertEquals("Will Price", con0.getName());
-//
+    // Contributors
+    List<Contributor> contributors = model.getContributors();
+    Contributor con0 = contributors.get(0);
+    assertEquals("Will Price", con0.getName());
+
 //    // DependencyManagement
 //    List<Dependency> depManDependencies = model.getDependencyManagement().getDependencies();
 //    assertEquals(2, depManDependencies.size());
@@ -107,26 +107,26 @@ public class TomlModelReaderTest {
 //    assertEquals("org.codehaus.groovy", d2.getGroupId());
 //    assertEquals("groovy", d2.getArtifactId());
 //    assertEquals("1.6.5", d2.getVersion());
-//
-//    // Modules
-//    List<String> modules = model.getModules();
-//    assertEquals("reader", modules.get(0));
-//    assertEquals("writer", modules.get(1));
-//    assertEquals("shell-integration", modules.get(2));
-//
-//    // Build
-//    Build build = model.getBuild();
-//    List<Plugin> plugins = build.getPlugins();
-//    assertEquals(1, plugins.size());
-//    Plugin p0 = plugins.get(0);
-//    assertEquals("org.apache.maven.plugins", p0.getGroupId());
-//    assertEquals("maven-compiler-plugin", p0.getArtifactId());
-//    assertEquals("2.0.2", p0.getVersion());
-//    Xpp3Dom configuration = (Xpp3Dom) p0.getConfiguration();
-//    assertNotNull(configuration);
-//    assertEquals(2, configuration.getChildCount());
-//    assertEquals("1.6", configuration.getChild("source").getValue());
-//    assertEquals("1.5", configuration.getChild("target").getValue());
+
+    // Modules
+    List<String> modules = model.getModules();
+    assertEquals("reader", modules.get(0));
+    assertEquals("writer", modules.get(1));
+    assertEquals("shell-integration", modules.get(2));
+
+    // Build
+    Build build = model.getBuild();
+    List<Plugin> plugins = build.getPlugins();
+    assertEquals(1, plugins.size());
+    Plugin p0 = plugins.get(0);
+    assertEquals("org.apache.maven.plugins", p0.getGroupId());
+    assertEquals("maven-compiler-plugin", p0.getArtifactId());
+    assertEquals("2.0.2", p0.getVersion());
+    Xpp3Dom configuration = (Xpp3Dom) p0.getConfiguration();
+    assertNotNull(configuration);
+    assertEquals(2, configuration.getChildCount());
+    assertEquals("1.6", configuration.getChild("source").getValue());
+    assertEquals("1.5", configuration.getChild("target").getValue());
 //
 //    // DistributionManagement
 //    DistributionManagement distMan = model.getDistributionManagement();
