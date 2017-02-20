@@ -1,0 +1,29 @@
+groupId = "org.sonatype.raven"
+artifactId = "raven"
+version = "1.0-SNAPSHOT"
+packaging = "jar"
+name = "Raven"
+description = "Hybrid Maven 3.x & JRuby Build System"
+
+[properties]
+mavenVersion = "3.0"
+
+developers = [
+  { id = "jvanzyl", name = "Jason van Zyl" }
+]
+
+contributors = [
+ { name = "Will Price" }
+]
+
+[dependencies]
+"org.apache.maven:maven-core" = "3.0"
+"com.moandjiezana.toml:toml4j" = "0.7.1"
+"org.codehaus.groovy:groovy" = { version = "1.6.5" }
+#    exclusions:
+#    - {artifactId: jline, groupId: jline}
+#    - {artifactId: junit, groupId: junit}
+#    - {artifactId: ant, groupId: org.apache.ant}
+#    - {artifactId: ant-launcher, groupId: org.apache.ant}
+#FIXME test inline table syntax for scopes etc foo = {}
+#FIXME add [dependencies.test] etc
