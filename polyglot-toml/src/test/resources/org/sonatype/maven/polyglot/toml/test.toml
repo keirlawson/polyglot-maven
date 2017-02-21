@@ -9,9 +9,20 @@ developers = [
   { id = "jvanzyl", name = "Jason van Zyl" }
 ]
 
+organization = { name = "somename", url = "someurl" }
+
 contributors = [
  { name = "Will Price" }
 ]
+
+licenses = [
+  { name = "somelicense", url = "someurl" },
+  { name = "anotherlicense" }
+]
+
+scm = { connection = "someconnection", tag = "sometag" }
+
+issueManagement = { system = "Bugzilla", url = "someurl" }
 
 modules = [
   "reader",
@@ -25,12 +36,14 @@ mavenVersion = "3.0"
 [dependencies]
 "org.apache.maven:maven-core" = "3.0"
 "com.moandjiezana.toml:toml4j" = "0.7.1"
-"org.codehaus.groovy:groovy" = { version = "1.6.5" }
-#    exclusions:
-#    - {artifactId: jline, groupId: jline}
-#    - {artifactId: junit, groupId: junit}
-#    - {artifactId: ant, groupId: org.apache.ant}
-#    - {artifactId: ant-launcher, groupId: org.apache.ant}
+[dependencies."org.codehaus.groovy:groovy"]
+version = "1.6.5"
+exclusions = [
+  {artifactId = "jline", groupId = "jline"},
+  {artifactId = "junit", groupId = "junit"},
+  {artifactId = "ant", groupId = "org.apache.ant"},
+  {artifactId = "ant-launcher", groupId = "org.apache.ant"},
+]
 #FIXME test inline table syntax for scopes etc foo = {}
 #FIXME add [dependencies.test] etc
 

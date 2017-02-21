@@ -32,28 +32,26 @@ public class TomlModelReader extends ModelReaderSupport {
 
   private Model parseProject(Toml projectToml) {
     Model m = parseBasicInfo(projectToml);
+    m.setOrganization(parseOrganization(projectToml.getTable("organization")));
+    m.setLicenses(parseLicenses(projectToml.getTables("licenses")));
     parseProperties(projectToml, m);
     parseDevelopers(projectToml, m);
     parseDependencies(projectToml, m);
     parseContributors(projectToml, m);
     parseModules(projectToml, m);
     parseBuild(projectToml, m);
+    m.setScm(parseScm(projectToml.getTable("scm")));
+    m.setIssueManagement(parseIssueManagement(projectToml.getTable("issueManagement")));
     return m;
   }
 
   /*
 parent
-url
-inceptionYear
-organization
-licenses/license*
 developers/developer*
 contributors/contributor*
 mailingLists/mailingList*
 prerequisites
 modules/module*
-scm
-issueManagement
 ciManagement
 distributionManagement
 properties/key=value*
@@ -62,7 +60,6 @@ dependencies/dependency*
 repositories/repository*
 pluginRepositories/pluginRepository*
 build
-reports
 reporting
 profiles/profile*
    */
@@ -88,27 +85,51 @@ profiles/profile*
     model.setPackaging(pom.getString("packaging"));
     model.setName(pom.getString("name"));
     model.setDescription(pom.getString("description"));
+    model.setUrl(pom.getString("url"));
+    model.setInceptionYear(pom.getString("inceptionYear"));
     return model;
+  }
+
+  private Organization parseOrganization(final Toml organisationTable) {
+    Organization organization = new Organization();
+    organization.setName(organisationTable.getString("name"));
+    organization.setUrl(organisationTable.getString("url"));
+    return organization;
+  }
+
+  private List<License> parseLicenses(final List<Toml> licenceTables) {
+    return parseTablesToList(licenceTables, License.class);
+  }
+
+  private Scm parseScm(final Toml scmTable) {
+    return scmTable.to(Scm.class);
+  }
+
+  private IssueManagement parseIssueManagement(final Toml issueManagementTable) {
+    return issueManagementTable.to(IssueManagement.class);
   }
 
   // FIXME: 2/20/17 neither this nor contributors has properties support
   private Model parseDevelopers(final Toml pom, final Model model) {
-    final List<Developer> developers = parseTableToList(pom, "developers", Developer.class);
+    final List<Developer> developers = parseTablesToList(pom.getTables("developers"), Developer.class);
     model.setDevelopers(developers);
     return model;
   }
 
   private Model parseContributors(final Toml pom, final Model model) {
-    final List<Contributor> contributors = parseTableToList(pom, "contributors", Contributor.class);
+    final List<Contributor> contributors = parseTablesToList(pom.getTables("contributors"), Contributor.class);
     model.setContributors(contributors);
     return model;
   }
 
-  private <T> List<T> parseTableToList(final Toml pom, final String key, final Class<T> clazz) {
+  private List<Exclusion> parseExclusion(final List<Toml> exclusionTables) {
+    return parseTablesToList(exclusionTables, Exclusion.class);
+  }
+
+  private <T> List<T> parseTablesToList(final List<Toml> tables, final Class<T> clazz) {
     final List<T> list = new ArrayList<>();
-    List<Toml> developerTables = pom.getTables(key);
-    for (Toml developerTable : developerTables) {
-      list.add(developerTable.to(clazz));
+    for (Toml table : tables) {
+      list.add(table.to(clazz));
     }
     return list;
   }
@@ -130,13 +151,23 @@ profiles/profile*
   }
 
   private Model parseBuild(final Toml pom, final Model model) {
-    parseBuildPlugins(pom.getTables("plugins"), model);
+    Build build = new Build();
+    build.setPlugins(parseBuildPlugins(pom.getTables("plugins")));
     return model;
   }
 
-  private Model parseBuildPlugins(final List<Toml> pluginTomls, final Model model) {
-    
-    return model;
+  private List<Plugin> parseBuildPlugins(final List<Toml> pluginTomls) {
+    List<Plugin> plugins = new ArrayList<>();
+//    for (Toml pluginToml : pluginTomls) { FIXME
+//      plugins.add(parsePlugin(pluginToml));
+//    }
+    return plugins;
+  }
+
+  private Plugin parsePlugin(final Toml pluginToml) {
+    Plugin plugin = new Plugin();
+    // FIXME: 21/02/17 implement
+    return plugin;
   }
 
   private PluginExecution parseExecution(final Toml executionTable) {
@@ -144,7 +175,7 @@ profiles/profile*
     pluginExecution.setId(executionTable.getString("id"));
     pluginExecution.setPhase(executionTable.getString("phase"));
     pluginExecution.setInherited(executionTable.getString("inherited"));
-    pluginExecution.setGoals((List<String>) executionTable.getList());
+    //pluginExecution.setGoals((List<String>) executionTable.getList()); FIXME
     pluginExecution.setConfiguration(executionTable.getTable("configuration"));//FIXME this probably doesn't work
     return pluginExecution;
   }
