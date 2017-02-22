@@ -23,9 +23,27 @@ public class TomlModelReaderTest {
 //    getModel().clone();
 //  }
 
+
+  @Test
+  public void testEmptyFileParsing() throws Exception {
+    Model model = getModel("empty.toml");
+    assertNotNull(model);
+  }
+
+  @Test
+  public void testDependeciesParsing() throws Exception {
+    Model model = getModel("dependencyWithExclusions.toml");
+    assertNotNull(model);
+
+    assertEquals(1, model.getDependencies().size());
+    Dependency dependency = model.getDependencies().get(0);
+    assertEquals("1.6.5", dependency.getVersion());
+    assertEquals(4, dependency.getExclusions().size());
+  }
+
   @Test
   public void testModelReader() throws Exception {
-    Model model = getModel();
+    Model model = getModel("test.toml");
     assertNotNull(model);
 
 //    Parent parent = model.getParent();
@@ -182,9 +200,9 @@ public class TomlModelReaderTest {
 //    assertFalse(output, output.contains("properties: {}"));
 //  }
 
-  protected Model getModel() throws Exception {
+  protected Model getModel(String filePath) throws Exception {
     TomlModelReader modelReader = new TomlModelReader();
-    URL url = getClass().getResource("test.toml");
+    URL url = getClass().getResource(filePath);
     assertNotNull(url);
     InputStream reader = url.openStream();
     return modelReader.read(reader, null);

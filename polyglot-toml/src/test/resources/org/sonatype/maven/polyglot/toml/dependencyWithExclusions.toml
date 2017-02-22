@@ -1,0 +1,8 @@
+[dependencies."org.codehaus.groovy:groovy"]
+version = "1.6.5"
+exclusions = [
+  {artifactId = "jline", groupId = "jline"},
+  {artifactId = "junit", groupId = "junit"},
+  {artifactId = "ant", groupId = "org.apache.ant"},
+  {artifactId = "ant-launcher", groupId = "org.apache.ant"},
+]
